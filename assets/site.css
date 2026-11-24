@@ -1,0 +1,15 @@
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; }
+.ph { background: repeating-linear-gradient(45deg,#e8edf5 0 12px,#f1f4f9 12px 24px); }
+.grid-bg { background-image: linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px); background-size: 48px 48px; }
+
+/* from 21st.dev hero-1 */
+@keyframes fade-in { 0% { opacity:0; transform:translateY(20px); } 100% { opacity:1; transform:translateY(0); } }
+@keyframes fade-up { 0% { opacity:0; transform:translateY(40px); } 100% { opacity:1; transform:translateY(0); } }
+.animate-fade-in { animation: fade-in 1s ease .2s forwards; }
+.animate-fade-up { animation: fade-up 1.2s ease .4s forwards; }
+@media (prefers-reduced-motion: reduce) { .animate-fade-in, .animate-fade-up { animation: none; opacity: 1 !important; } }
+
+/* footer tooltips (21st.dev footer) */
+.tip { position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .15s; }
+.group:hover .tip, .group:focus-visible .tip { opacity:1; }
