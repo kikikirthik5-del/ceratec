@@ -5,106 +5,823 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ceratec — Precision Cutting Tools</title>
 <meta name="description" content="Ceratec manufactures solid carbide end mills, drills, inserts and custom cutting tools.">
-<script src="https://cdn.tailwindcss.com/3.4.5"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css">
-<script src="assets/site.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300..700&family=IBM+Plex+Mono&family=Inter:wght@900&display=swap" rel="stylesheet">
+<style>
+/* Palette: navy + its colour-wheel opposite (orange) on cream paper */
+:root {
+  --page: #f6f1e7; --paper: #ebe2d1; --sheet: #fbf8f2;
+  --ink: #13254b; --ink-2: #1d3466; --accent: #ff7a1a; --accent-soft: #ffb46b;
+  --muted: #6d7387; --line: rgb(19 37 75 / .16);
+  --display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --sweep: cubic-bezier(.76, 0, .24, 1);
+  --gutter: 16px;
+}
+@media (min-width: 640px) { :root { --gutter: 24px; } }
+@media (min-width: 1024px) { :root { --gutter: 40px; } }
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+button, input, textarea { font: inherit; color: inherit; }
+img, svg { display: block; }
+.wrap { width: min(100% - 2 * var(--gutter), 1440px); margin-inline: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.acc { color: var(--accent); }
+.mono { font-family: var(--mono); }
+.eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
+.display { font-family: var(--display); font-weight: 900; text-transform: uppercase; letter-spacing: -.02em; line-height: .9; margin: 0; font-size: clamp(44px, 8vw, 120px); }
+.ph { background: repeating-linear-gradient(45deg, var(--paper) 0 12px, #e4d9c4 12px 24px); border-radius: 10px; display: grid; place-items: center; color: var(--muted); font: 12px var(--mono); }
+
+/* ---------- Splash (ink page that opens onto the hero) ---------- */
+.splash { position: fixed; inset: 0; z-index: 100; background: var(--ink); display: flex; flex-direction: column; }
+.splash-roles { margin: 0; padding: 28px var(--gutter); color: rgb(246 241 231 / .7); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; opacity: 0; transition: opacity .8s .2s; }
+.splash-roles i { color: var(--accent); font-style: normal; margin: 0 .5em; }
+.splash.go .splash-roles { opacity: 1; }
+.splash-name { position: absolute; inset: 0; margin: auto; width: min(88vw, 130svh); height: auto; max-height: 70%; overflow: visible; font-family: var(--display); font-weight: 900; }
+.wipe { transform-box: fill-box; transform-origin: left; transform: scaleX(0); }
+.flood { transform-box: fill-box; transform-origin: center; transform: translateX(-260px); }
+.splash.go .wipe { animation: wipe .75s var(--ease) .1s forwards; }
+.splash.go .flood { animation: flood .65s var(--sweep) .7s forwards; }
+@keyframes wipe { to { transform: scaleX(1); } }
+@keyframes flood { to { transform: translateX(500px) scale(11); } }
+@media (prefers-reduced-motion: reduce) { .splash { display: none; } }
+
+/* ---------- Hero ---------- */
+.hero { position: relative; min-height: 100svh; overflow: clip; display: flex; flex-direction: column; }
+.nav { display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; align-items: center; row-gap: 6px; padding: 14px 0 6px; }
+.nav-logo { grid-row: 1; grid-column: 1 / -1; justify-self: center; font: 900 28px/1 var(--display); letter-spacing: -.045em; color: var(--accent); overflow: hidden; }
+.nav-cta { grid-row: 1; grid-column: 1 / -1; justify-self: end; }
+.nav-left, .nav-right { display: contents; list-style: none; margin: 0; padding: 0; }
+.nav-left > li, .nav-right > li { grid-row: 2; }
+.nav-status { display: none; }
+.nav-link { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; background: none; border: 0; padding: 0; cursor: pointer; }
+.nav-link[aria-current]::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.roll { position: relative; display: inline-block; overflow: hidden; line-height: 1.25; }
+.roll > span { display: block; transition: transform .5s var(--ease); }
+.roll > span + span { position: absolute; inset: 0; transform: translateY(100%); }
+@media (hover: hover) {
+  .nav-link:hover .roll > span:first-child { transform: translateY(-100%); }
+  .nav-link:hover .roll > span + span { transform: none; }
+}
+@media (min-width: 640px) {
+  .nav { grid-template-columns: 1fr auto 1fr; grid-template-areas: 'left logo right'; height: 84px; padding: 0; --gap: clamp(16px, 2.6vw, 28px); }
+  .nav-logo { grid-area: logo; font-size: clamp(26px, 2.3vw, 32px); }
+  .nav-left, .nav-right { display: flex; gap: var(--gap); }
+  .nav-left { grid-area: left; justify-self: end; margin-right: var(--gap); }
+  .nav-right { grid-area: right; justify-self: start; margin-left: var(--gap); }
+  .nav-cta { grid-area: right; }
+}
+@media (min-width: 1024px) { .nav { --gap: clamp(28px, 4vw, 64px); } }
+@media (min-width: 1280px) {
+  .nav-status { grid-area: left; justify-self: start; display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; white-space: nowrap; }
+  .dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--accent); animation: breathe 2.4s var(--ease) infinite; }
+}
+@keyframes breathe { 0% { opacity: .55; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(3); } }
+
+/* Ink button: outlined pill + orange disc; ink floods out from the disc on hover */
+.cta { --mark: 34px; position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: 14px; height: 44px; padding: 0 5px 0 20px; overflow: hidden; border: 1px solid rgb(19 37 75 / .4); border-radius: 999px; background: none; color: var(--ink); font-size: 12.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; cursor: pointer; transition: color .4s var(--ease), border-color .4s var(--ease); }
+.cta::before { content: ''; position: absolute; z-index: -1; top: 50%; right: calc(5px + var(--mark) / 2); width: var(--mark); height: var(--mark); margin: calc(var(--mark) / -2) calc(var(--mark) / -2) 0 0; border-radius: 50%; background: var(--ink); transform: scale(0); transition: transform .65s var(--ease); }
+.mark { position: relative; display: grid; place-items: center; width: var(--mark, 34px); height: var(--mark, 34px); overflow: hidden; border-radius: 50%; background: var(--accent); color: var(--page); flex: none; }
+.mark svg { position: absolute; width: 44%; height: 44%; transition: transform .5s var(--ease); }
+.mark .in { transform: translate(-160%, 160%); }
+@media (hover: hover) {
+  .cta:hover { border-color: var(--ink); color: var(--page); }
+  .cta:hover::before { transform: scale(14); }
+  .cta:hover .out, .book:hover .book-arrow .out { transform: translate(160%, -160%); }
+  .cta:hover .in, .book:hover .book-arrow .in { transform: none; }
+}
+.cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.cta.light { border-color: rgb(246 241 231 / .4); color: var(--page); }
+.cta.light::before { background: var(--page); }
+@media (hover: hover) { .cta.light:hover { color: var(--ink); } }
+@media (max-width: 639px) {
+  .nav-cta .cta { gap: 0; padding: 4px; }
+  .nav-cta .cta-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
+
+/* Entrance: masked letters and lines rise once the splash opens */
+.rise { display: inline-block; transform: translateY(var(--from, 105%)); transition: transform 1.05s var(--ease) var(--d, 0s); }
+.fade { opacity: 0; transform: translateY(10px); transition: opacity .9s var(--ease) var(--d, 0s), transform .9s var(--ease) var(--d, 0s); }
+.wipe-in { clip-path: inset(0 0 100% 0); transition: clip-path 1.05s var(--ease) var(--d, 0s); }
+.go .rise, .go .fade { transform: none; opacity: 1; }
+.go .wipe-in { clip-path: inset(-10% -10% -10% -10%); }
+
+/* Stage: phones stack everything; wide screens get the composition */
+.stage { position: relative; flex: 1; display: flex; flex-direction: column; gap: 36px; padding: 12px 0 40px; }
+.name { margin: 0; display: flex; flex-direction: column; font: 900 26vw/1 var(--display); text-transform: uppercase; letter-spacing: .02em; }
+.name-line { display: block; white-space: nowrap; margin-block: -.12em; }
+.name-first { color: var(--accent); margin-left: -.039em; }
+.name-last { color: var(--ink); align-self: flex-end; margin-right: -.05em; }
+.lm { display: inline-block; clip-path: inset(.11em -.25em .11em -.25em); }
+.art-wrap { position: relative; height: 420px; border-radius: 10px 10px 0 0; background: var(--paper); display: grid; place-items: end center; overflow: hidden; }
+.art { height: 96%; width: auto; translate: var(--px, 0px) 0; }
+.art-in { clip-path: inset(100% 0 0 0); transform: scale(1.06); transform-origin: bottom; transition: clip-path 1.3s var(--ease) var(--d), transform 1.3s var(--ease) var(--d); }
+.go .art-in { clip-path: inset(0); transform: none; }
+.intro-roles { display: flex; flex-wrap: wrap; gap: .4em .6em; margin: 0 0 16px; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
+.intro-roles i, .slash { color: var(--accent); font-style: normal; }
+.intro-head { margin: 0 0 24px; font-size: 24px; font-weight: 500; line-height: 1.14; letter-spacing: -.01em; }
+.intro-head span { display: block; }
+.intro-rule { width: 52px; height: 2px; border: 0; margin: 0 0 24px; background: var(--accent); transform-origin: left; transform: scaleX(0); transition: transform .9s var(--ease) var(--d); }
+.go .intro-rule { transform: none; }
+.intro-desc { max-width: 280px; margin: 0; color: var(--muted); font-size: 15px; font-weight: 300; line-height: 1.6; }
+.socials { display: flex; align-items: center; gap: 10px; list-style: none; margin: 0; padding: 0; font-size: 14px; }
+.ulink { position: relative; display: inline-flex; min-height: 40px; align-items: center; }
+@media (hover: hover) {
+  .ulink::after { content: ''; position: absolute; inset-inline: 0; bottom: calc(50% - .95em); height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .45s var(--ease); }
+  .ulink:hover::after { transform: scaleX(1); transform-origin: left; }
+}
+
+/* QC note: a sheet that types itself, then the stamp presses */
+.pad { min-height: 320px; display: flex; }
+.sheet { position: relative; flex: 1; display: flex; flex-direction: column; padding: 24px 22px 18px; border-radius: 4px 4px 0 0; background: var(--sheet); box-shadow: 0 18px 40px -18px rgb(19 37 75 / .45); transform: rotate(-1.4deg); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.sheet.leaving { opacity: 0; transform: translateY(40px) scale(.94) rotate(-1.4deg); }
+.sheet-eyebrow { margin: 0; padding-right: 80px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; }
+.stamp { position: absolute; top: 14px; right: 14px; display: grid; place-items: center; width: 76px; height: 76px; border: 2px solid var(--accent); border-radius: 50%; color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; text-align: center; line-height: 1.3; transform: rotate(12deg); opacity: .35; transition: transform .45s var(--ease), background-color .3s, color .3s, opacity .4s; }
+.stamp.ready { opacity: 1; }
+.stamp.pressed { background: var(--accent); color: var(--page); transform: rotate(0) scale(.86); }
+.sheet-greet, .sheet-text { font-family: var(--mono); font-size: 16px; }
+.sheet-greet { margin: 20px 0 4px; }
+.sheet-text { flex: 1; margin: 0; line-height: 1.65; white-space: pre-wrap; }
+.caret { display: inline-block; width: .55em; height: 1.1em; margin-left: 2px; background: var(--accent); vertical-align: -.2em; animation: caret 1s steps(2, jump-none) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
+.sheet-meta { margin: 12px 0 0; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; }
+
+/* Catalogue hardcover carousel (the "book" card) */
+.book-frame { position: relative; display: block; width: 100%; aspect-ratio: 324 / 207; padding: 0; border: 0; border-radius: 10px; background: var(--paper); overflow: hidden; container-type: size; cursor: pointer; }
+.book-stage { position: absolute; inset: 0; display: grid; place-items: center; perspective: 900px; }
+.book-shadow { position: absolute; bottom: 9cqh; width: 46cqh; height: 7cqh; border-radius: 50%; background: radial-gradient(closest-side, rgb(19 37 75 / .35), transparent); filter: blur(4px); transition: transform .9s var(--ease); }
+.book-frame.open .book-shadow { transform: scaleX(2.1); }
+.slot { position: absolute; inset: 0; display: grid; place-items: center; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.65, 0, .35, 1); }
+.b3d { --depth: 9cqh; position: relative; height: 74cqh; aspect-ratio: .72; transform-style: preserve-3d; transform: translateX(var(--sx, 0%)) scale(var(--sc, 1)) rotateX(var(--rx, 6deg)) rotateY(var(--ry, -24deg)); transition: transform .9s var(--ease); }
+.b3d > span { position: absolute; }
+.b-back { inset: 0; border-radius: 2px 5px 5px 2px; background: color-mix(in srgb, var(--cover) 78%, black); transform: translateZ(calc(var(--depth) / -2)); }
+.b-edge { top: 2%; right: 0; width: var(--depth); height: 96%; background: repeating-linear-gradient(to right, #f3eee6 0 1.5px, #ddd5c8 1.5px 2.5px); transform: translateX(50%) rotateY(90deg); }
+.b-spine { top: 0; left: 0; width: var(--depth); height: 100%; display: grid; place-items: center; overflow: hidden; background: var(--spine); transform: translateX(-50%) rotateY(-90deg); }
+.b-spine span { color: var(--page); font-size: 3.4cqh; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; transform: rotate(90deg); }
+.b-page { inset: 2% 3% 2% 0; display: flex; flex-direction: column; justify-content: center; gap: 2.5cqh; padding: 0 10% 0 14%; background: linear-gradient(to right, rgb(19 37 75 / .12), transparent 14%), var(--sheet); transform: translateZ(calc(var(--depth) / 2 - 2px)); color: #2a2f3d; font-size: 3.8cqh; line-height: 1.5; text-align: left; }
+.b-folio { position: absolute; bottom: 6%; left: 0; right: 0; color: var(--muted); font-size: 3cqh; text-align: center; }
+.b-hinge { inset: 0; transform: translateZ(calc(var(--depth) / 2)); transform-style: preserve-3d; }
+.b-cover { position: absolute; inset: 0; transform-origin: left center; transform-style: preserve-3d; transform: rotateY(var(--open, 0deg)); transition: transform 1s var(--ease); }
+.b-front, .b-inside { position: absolute; inset: 0; display: flex; flex-direction: column; backface-visibility: hidden; text-align: left; }
+.b-front { justify-content: space-between; padding: 11% 10% 9%; border-radius: 2px 5px 5px 2px; overflow: hidden; background: var(--cover); color: var(--ink); box-shadow: inset 3px 0 0 rgb(255 255 255 / .25); }
+.b-front svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.b-title { position: relative; font: 900 9.6cqh/.92 var(--display); letter-spacing: -.02em; text-transform: uppercase; }
+.b-title span { display: block; }
+.b-by { position: relative; font-size: 2.8cqh; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; }
+.b-inside { justify-content: center; gap: 2.5cqh; padding: 0 12%; border-radius: 5px 2px 2px 5px; background: linear-gradient(to left, rgb(19 37 75 / .12), transparent 14%), var(--sheet); transform: rotateY(180deg); }
+.b-chapter { color: var(--accent); font-size: 3cqh; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+.b-inside-title { font: 900 8cqh/.95 var(--display); letter-spacing: -.02em; text-transform: uppercase; }
+@media (hover: hover) and (pointer: fine) { .book-frame:hover:not(.open) .b-cover { --open: -34deg; } }
+.book-frame.open .b3d { --sx: 50%; --sc: 1.2; --rx: 0deg; --ry: 0deg; }
+.book-frame.open .b-cover { --open: -178deg; }
+.book-cap { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.book-label { margin-right: auto; font-size: 15px; font-weight: 500; white-space: nowrap; }
+.book-topics { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.book-arrow { --mark: 28px; position: relative; border-radius: 50%; }
+
+@media (min-width: 640px) and (max-width: 1023px), (max-aspect-ratio: 5/4) and (min-width: 640px) {
+  .stage { display: grid; grid-template-columns: 1fr 1fr; gap: 40px 32px; }
+  .name, .art-wrap, .pad, .socials { grid-column: 1 / -1; }
+  .art-wrap { height: 520px; }
+}
+
+/* Wide landscape screens: the composition */
+@media (min-width: 1024px) and (min-aspect-ratio: 5/4) {
+  .stage { display: block; padding: 0; min-height: max(calc(100svh - 84px), calc(min(21vw, 300px) * 1.62 + 330px)); --fs: min(21vw, 300px); }
+  .name { position: absolute; inset: 1vh 0 auto; font-size: var(--fs); z-index: 0; }
+  .art-wrap { position: absolute; left: 46%; bottom: 0; height: calc(100% - 2vh); width: auto; background: none; z-index: 2; transform: translateX(-50%); overflow: visible; border-radius: 0; }
+  .art { height: 100%; }
+  .intro { position: absolute; left: 0; top: calc(1vh + var(--fs) * 1.02); width: 260px; z-index: 3; }
+  .socials { position: absolute; left: 0; bottom: 36px; z-index: 3; font-size: 13px; }
+  .book { position: absolute; right: 0; top: 2vh; width: min(290px, 19vw); z-index: 1; }
+  .book-cap { margin-top: 8px; }
+  .book-label { font-size: 13px; }
+  .pad { position: absolute; right: 0; bottom: 0; width: min(440px, 32vw); top: calc(1vh + var(--fs) * 1.62); min-height: 0; z-index: 1; }
+}
+
+/* Custom cursor (mouse only) */
+.cursor { position: fixed; inset: 0; z-index: 200; pointer-events: none; }
+.c-dot, .c-ring, .c-disc { position: absolute; top: 0; left: 0; border-radius: 50%; opacity: 0; transition: opacity .3s; }
+.c-dot { width: 10px; height: 10px; margin: -5px; background: var(--accent); box-shadow: 0 0 0 2px var(--page); transition: opacity .3s, scale .3s var(--ease); }
+.c-ring { width: 44px; height: 44px; margin: -22px; border: 1.5px solid var(--accent); scale: .2; transition: opacity .35s, scale .35s var(--ease); }
+.c-disc { width: 72px; height: 72px; margin: -36px; display: grid; place-items: center; background: var(--accent); color: var(--page); font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; scale: 0; transition: opacity .4s, scale .4s var(--ease); }
+.cursor.on .c-dot { opacity: 1; }
+.cursor.link .c-ring { opacity: 1; scale: 1; } .cursor.link .c-dot { scale: .5; }
+.cursor.read .c-disc { opacity: 1; scale: 1; } .cursor.read .c-dot { scale: 0; }
+.has-cursor, .has-cursor a, .has-cursor button, .has-cursor .book-frame { cursor: none; }
+
+/* Mini bar once the hero has scrolled away */
+.minibar { position: fixed; top: 0; inset-inline: 0; z-index: 50; background: rgb(246 241 231 / .88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); transform: translateY(-100%); transition: transform .5s var(--ease); }
+.minibar.show { transform: none; }
+.minibar .wrap { height: 60px; display: flex; align-items: center; gap: 24px; }
+.minibar .logo { font: 900 22px/1 var(--display); letter-spacing: -.045em; color: var(--accent); margin-right: auto; }
+.minibar nav { display: none; gap: 22px; }
+@media (min-width: 900px) { .minibar nav { display: flex; } }
+.search-btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: none; cursor: pointer; color: var(--muted); font-size: 13px; }
+.search-btn kbd { font: 10px var(--mono); border: 1px solid var(--line); border-radius: 4px; padding: 1px 4px; }
+
+/* ---------- Sections ---------- */
+.sec { padding: clamp(80px, 12vw, 160px) 0; }
+.about-top { display: grid; gap: 40px; align-items: end; }
+.about-copy p { max-width: 520px; color: var(--muted); font-size: 17px; line-height: 1.65; margin: 0 0 16px; }
+.about-grid { display: grid; gap: 16px; margin-top: 56px; grid-template-columns: 1fr 1fr; }
+.about-grid .ph:first-child { grid-row: span 2; min-height: 420px; }
+.about-grid .ph { min-height: 200px; }
+.values { display: grid; gap: 1px; margin-top: 56px; background: var(--line); border: 1px solid var(--line); grid-template-columns: 1fr; }
+.value { background: var(--page); padding: 28px; }
+.value b { display: block; font: 900 20px/1 var(--display); text-transform: uppercase; letter-spacing: -.01em; margin-bottom: 10px; }
+.value p { margin: 0; color: var(--muted); line-height: 1.55; }
+.value .num { font: 12px var(--mono); color: var(--accent); }
+@media (min-width: 768px) { .about-top { grid-template-columns: 1.2fr 1fr; } .values { grid-template-columns: repeat(4, 1fr); } }
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; margin-top: 64px; }
+.stats b { display: block; font: 900 clamp(40px, 6vw, 80px)/1 var(--display); color: var(--ink); }
+.stats b em { color: var(--accent); font-style: normal; }
+.stats span { color: var(--muted); font-size: 14px; }
+@media (min-width: 768px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+
+.marquee { background: var(--ink); color: var(--page); overflow: hidden; padding: 22px 0; }
+.marquee-track { display: flex; width: max-content; animation: scroll 40s linear infinite; font: 900 clamp(28px, 4vw, 56px)/1 var(--display); text-transform: uppercase; }
+.marquee-track span { padding-right: .6em; white-space: nowrap; }
+.marquee-track i { color: var(--accent); font-style: normal; padding-right: .6em; }
+@keyframes scroll { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
+
+.prod-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 24px; }
+.filter { position: relative; width: min(100%, 340px); }
+.filter input { width: 100%; height: 48px; padding: 0 16px 0 42px; border: 1px solid var(--line); border-radius: 999px; background: var(--sheet); outline: none; }
+.filter input:focus { border-color: var(--accent); }
+.filter svg { position: absolute; left: 16px; top: 50%; translate: 0 -50%; width: 16px; color: var(--muted); }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 32px 0 12px; }
+.pill { height: 38px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; background: none; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .3s, color .3s; }
+.pill.on { background: var(--ink); color: var(--page); border-color: var(--ink); }
+.count { font: 12px var(--mono); color: var(--muted); margin: 0 0 20px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.card { position: relative; display: flex; flex-direction: column; border-radius: 12px; background: var(--sheet); border: 1px solid var(--line); overflow: hidden; transition: transform .5s var(--ease), box-shadow .5s var(--ease); }
+.card:hover { transform: translateY(-4px); box-shadow: 0 24px 40px -24px rgb(19 37 75 / .4); }
+.card .ph { aspect-ratio: 4 / 3; border-radius: 0; }
+.card-body { padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.card-cat { font: 11px var(--mono); color: var(--accent); text-transform: uppercase; letter-spacing: .1em; }
+.card-name { font-weight: 600; font-size: 17px; line-height: 1.3; flex: 1; }
+.card-link { margin-top: 10px; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; background: none; border: 0; padding: 0; text-align: left; cursor: pointer; }
+.empty { display: none; padding: 40px 0; color: var(--muted); }
+
+.catalogue { position: relative; background: var(--ink); color: var(--page); overflow: hidden; }
+.catalogue .eyebrow { color: rgb(246 241 231 / .6); }
+.sun { position: absolute; right: -8vw; top: -10vw; width: 44vw; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 40% 40%, var(--accent-soft), var(--accent) 60%); opacity: .95; }
+.sun::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-linear-gradient(to bottom, transparent 0 62%, var(--ink) 62% 64%, transparent 64% 68%); }
+.cat-list { position: relative; list-style: none; margin: 56px 0 0; padding: 0; border-top: 1px solid rgb(246 241 231 / .18); }
+.cat-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px 24px; padding: 24px 0; border-bottom: 1px solid rgb(246 241 231 / .18); }
+.cat-row .idx { font: 12px var(--mono); color: var(--accent); }
+.cat-row h3 { margin: 0; font: 900 clamp(22px, 3.2vw, 44px)/1 var(--display); text-transform: uppercase; letter-spacing: -.01em; }
+.cat-row small { display: block; margin-top: 6px; font: 12px var(--mono); color: rgb(246 241 231 / .55); }
+.waves { display: block; width: 100%; height: 90px; margin-top: 64px; }
+
+.contact-grid { display: grid; gap: 56px; }
+@media (min-width: 900px) { .contact-grid { grid-template-columns: 1fr 1fr; } }
+.details { list-style: none; margin: 40px 0 32px; padding: 0; display: grid; gap: 20px; }
+.details span { display: block; font: 11px var(--mono); color: var(--accent); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 4px; }
+.form { display: grid; gap: 22px; align-content: start; }
+.field label { display: block; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.field input, .field textarea { width: 100%; border: 0; border-bottom: 1.5px solid var(--line); background: none; padding: 8px 0; font-size: 17px; outline: none; resize: vertical; }
+.field input:focus, .field textarea:focus { border-color: var(--accent); }
+.two { display: grid; gap: 22px; }
+@media (min-width: 640px) { .two { grid-template-columns: 1fr 1fr; } }
+.done { display: none; font: 13px var(--mono); color: var(--accent); }
+.map { margin-top: 64px; aspect-ratio: 21 / 7; min-height: 200px; }
+
+.footer { background: var(--ink); color: var(--page); padding: 72px 0 28px; overflow: hidden; }
+.foot-word { font: 900 clamp(72px, 19vw, 300px)/.8 var(--display); letter-spacing: -.03em; color: rgb(246 241 231 / .09); margin: 0 0 56px; white-space: nowrap; }
+.foot-grid { display: grid; gap: 40px; grid-template-columns: 1fr; }
+@media (min-width: 768px) { .foot-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
+.foot-grid h4 { margin: 0 0 14px; font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: rgb(246 241 231 / .55); }
+.foot-grid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.news { display: flex; gap: 8px; margin-top: 12px; }
+.news input { flex: 1; min-width: 0; height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid rgb(246 241 231 / .25); background: rgb(246 241 231 / .06); outline: none; }
+.news input:focus { border-color: var(--accent); }
+.round { position: relative; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgb(246 241 231 / .25); transition: background .3s, color .3s; }
+.round:hover { background: var(--accent); border-color: var(--accent); }
+.round svg { width: 16px; height: 16px; }
+.tip { position: absolute; bottom: calc(100% + 8px); left: 50%; translate: -50% 0; white-space: nowrap; padding: 5px 10px; border-radius: 6px; background: var(--page); color: var(--ink); font-size: 12px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.round:hover .tip, .round:focus-visible .tip { opacity: 1; }
+.foot-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 56px; padding-top: 24px; border-top: 1px solid rgb(246 241 231 / .15); font-size: 13px; color: rgb(246 241 231 / .6); }
+
+/* Search overlay */
+.search { position: fixed; inset: 0; z-index: 150; display: none; padding: 10vh 16px 16px; background: rgb(19 37 75 / .55); backdrop-filter: blur(6px); }
+.search.open { display: block; }
+.search-box { max-width: 580px; margin: 0 auto; border-radius: 14px; background: var(--sheet); box-shadow: 0 40px 80px -30px rgb(0 0 0 / .5); overflow: hidden; }
+.search-box label { display: flex; align-items: center; gap: 12px; padding: 0 18px; border-bottom: 1px solid var(--line); color: var(--muted); }
+.search-box input { flex: 1; height: 60px; border: 0; background: none; outline: none; font-size: 17px; color: var(--ink); }
+.search-box ul { list-style: none; margin: 0; padding: 8px; max-height: 50vh; overflow: auto; }
+.search-box li a { display: flex; justify-content: space-between; gap: 12px; padding: 11px 12px; border-radius: 8px; }
+.search-box li a:hover, .search-box li a:focus { background: var(--paper); outline: none; }
+.search-box li small { font: 11px var(--mono); color: var(--accent); text-transform: uppercase; }
+.search-box .hint { padding: 24px 12px; text-align: center; color: var(--muted); font-size: 14px; }
+</style>
 </head>
-<body class="bg-white text-slate-800 antialiased">
-<div id="site-header"></div>
+<body>
+
+<!-- Ink splash (adapted from the 21st.dev "Elias" author hero) -->
+<div class="splash" id="splash" aria-hidden="true">
+  <p class="splash-roles">Carbide<i>/</i>Ceramic<i>/</i>Custom</p>
+  <svg class="splash-name" viewBox="0 20 1000 450">
+    <defs>
+      <clipPath id="wipe"><rect class="wipe" x="0" y="0" width="1000" height="480"/></clipPath>
+      <clipPath id="flood"><circle class="flood" cx="0" cy="245" r="70"/></clipPath>
+      <filter id="outline"><feMorphology in="SourceAlpha" operator="erode" radius="2" result="inside"/><feComposite in="SourceGraphic" in2="inside" operator="out"/></filter>
+    </defs>
+    <g clip-path="url(#wipe)" filter="url(#outline)" text-anchor="middle">
+      <text x="500" y="250" font-size="290" fill="#ff7a1a">CERA</text>
+      <text x="500" y="455" font-size="230" fill="#f6f1e7">TEC</text>
+    </g>
+    <g clip-path="url(#flood)" text-anchor="middle">
+      <text x="500" y="250" font-size="290" fill="#ff7a1a">CERA</text>
+      <text x="500" y="455" font-size="230" fill="#f6f1e7">TEC</text>
+    </g>
+  </svg>
+</div>
+
+<div class="cursor" id="cursor" aria-hidden="true"><div class="c-ring"></div><div class="c-disc">Open</div><div class="c-dot"></div></div>
+
+<header class="minibar" id="minibar">
+  <div class="wrap">
+    <a href="#top" class="logo">CERATEC</a>
+    <nav class="mini-links" aria-label="Sections">
+      <a class="nav-link" href="#about">About</a><a class="nav-link" href="#products">Products</a><a class="nav-link" href="#catalogue">Catalogue</a>
+    </nav>
+    <button class="search-btn" data-search><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search<kbd>Ctrl K</kbd></button>
+    <a class="cta" href="#contact" style="height:38px"><span class="cta-label">Get a quote</span><span class="mark" style="--mark:28px"></span></a>
+  </div>
+</header>
 
 <main>
-<!-- 21st.dev prompt 1: "Hero" (hero-1, dark variant), ported to static Tailwind -->
-<section class="relative isolate w-full overflow-hidden px-6 pt-28 md:pt-36 text-center md:px-8 min-h-[calc(100vh-100px)] text-white rounded-b-xl bg-[linear-gradient(to_bottom,#05070d,#05070d_30%,#2a4a80_78%,#ffffff_99%)]">
-  <div class="absolute -z-10 inset-0 opacity-80 h-[600px] w-full bg-[linear-gradient(to_right,#1c2538_1px,transparent_1px),linear-gradient(to_bottom,#1c2538_1px,transparent_1px)] bg-[size:6rem_5rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
-  <div class="absolute -z-10 left-1/2 top-[calc(100%-90px)] lg:top-[calc(100%-150px)] h-[500px] w-[700px] md:w-[1100px] lg:h-[750px] lg:w-[140%] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(closest-side,#05070d_82%,#9cc2ff)] opacity-0 animate-fade-up"></div>
-  <a href="about.html" class="group inline-block">
-    <span class="text-sm text-slate-400 mx-auto px-5 py-2 bg-gradient-to-tr from-zinc-300/5 via-gray-400/5 to-transparent border-2 border-white/5 rounded-3xl w-fit tracking-tight uppercase flex items-center justify-center">
-      Precision Engineered Since 20XX
-      <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
-    </span>
-  </a>
-  <h1 class="opacity-0 animate-fade-in text-balance bg-gradient-to-br from-white from-30% to-white/40 bg-clip-text py-6 text-5xl font-semibold leading-none tracking-tighter text-transparent sm:text-6xl md:text-7xl lg:text-8xl">Cutting tools built for zero compromise</h1>
-  <p class="opacity-0 animate-fade-in mb-12 text-balance text-lg tracking-tight text-slate-400 md:text-xl max-w-2xl mx-auto">Placeholder: solid carbide end mills, drills, inserts and custom tooling for aerospace, automotive and die &amp; mould industries.</p>
-  <div class="relative z-20 flex flex-wrap justify-center gap-3">
-    <a href="products.html" class="h-12 w-fit md:w-52 px-4 inline-flex items-center justify-center rounded-md bg-white text-slate-900 text-lg font-medium tracking-tighter hover:bg-white/90">Explore Products</a>
-    <a href="catalogue.html" class="h-12 w-fit md:w-52 px-4 inline-flex items-center justify-center rounded-md border border-white/20 text-lg font-medium tracking-tighter hover:bg-white/10">Download Catalogue</a>
+<!-- ===== HERO ===== -->
+<section class="hero" id="top" aria-label="Ceratec">
+  <div class="wrap">
+    <nav class="nav" aria-label="Main">
+      <a href="#top" class="nav-logo"><span class="rise" style="--d:0s">CERATEC</span></a>
+      <p class="nav-status fade" style="--d:.5s"><span class="dot"></span>Now taking orders <span class="slash">·</span> <span style="color:var(--ink)">Custom tools</span></p>
+      <ul class="nav-left">
+        <li class="fade" style="--d:.23s"><a class="nav-link" href="#top" aria-current="page"><span class="roll"><span>Home</span><span aria-hidden="true">Home</span></span></a></li>
+        <li class="fade" style="--d:.15s"><a class="nav-link" href="#about"><span class="roll"><span>About us</span><span aria-hidden="true">About us</span></span></a></li>
+      </ul>
+      <ul class="nav-right">
+        <li class="fade" style="--d:.15s"><a class="nav-link" href="#products"><span class="roll"><span>Products</span><span aria-hidden="true">Products</span></span></a></li>
+        <li class="fade" style="--d:.23s"><a class="nav-link" href="#catalogue"><span class="roll"><span>Catalogue</span><span aria-hidden="true">Catalogue</span></span></a></li>
+        <li class="fade" style="--d:.31s"><button class="nav-link" data-search aria-label="Search products"><span class="roll"><span>Search</span><span aria-hidden="true">Search</span></span></button></li>
+      </ul>
+      <div class="nav-cta fade" style="--d:.4s"><a class="cta" href="#contact"><span class="cta-label">Contact</span><span class="mark"></span></a></div>
+    </nav>
   </div>
-  <div class="relative z-10 mt-20 md:mt-28 mx-auto max-w-5xl opacity-0 animate-fade-up">
-    <div class="ph rounded-t-xl aspect-[16/7] grid place-items-center text-slate-400 font-medium border border-white/10 border-b-0">Product render / factory video</div>
-  </div>
-</section>
 
-<!-- Stats -->
-<section class="border-b border-slate-200">
-  <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-    <div><div class="text-3xl font-extrabold text-brand-900">25+</div><div class="text-sm text-slate-500">Years experience</div></div>
-    <div><div class="text-3xl font-extrabold text-brand-900">5,000+</div><div class="text-sm text-slate-500">Tool variants</div></div>
-    <div><div class="text-3xl font-extrabold text-brand-900">30+</div><div class="text-sm text-slate-500">Countries served</div></div>
-    <div><div class="text-3xl font-extrabold text-brand-900">ISO</div><div class="text-sm text-slate-500">9001:2015 certified</div></div>
-  </div>
-</section>
+  <div class="wrap stage">
+    <h1 class="name">
+      <span class="sr-only">Ceratec</span>
+      <span class="name-line name-first" aria-hidden="true" data-word="CERA" data-from="below" data-delay=".1"></span>
+      <span class="name-line name-last" aria-hidden="true" data-word="TEC" data-from="above" data-delay=".25"></span>
+    </h1>
 
-<!-- About teaser -->
-<section class="py-24">
-  <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-14 items-center">
-    <div class="ph rounded-2xl aspect-[4/3] grid place-items-center text-slate-400 text-sm">Factory photo</div>
-    <div>
-      <p class="text-brand-600 font-semibold text-sm uppercase tracking-wider">About Ceratec</p>
-      <h2 class="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-brand-900">Engineering precision into every edge.</h2>
-      <p class="mt-5 text-slate-600">Placeholder company summary. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p>
-      <a href="about.html" class="mt-8 inline-flex h-11 items-center px-5 rounded-md border border-slate-300 font-semibold hover:bg-slate-50">More about us →</a>
+    <div class="art-wrap">
+      <!-- Placeholder product render: a code-drawn solid carbide end mill; swap for a cut-out photo -->
+      <svg class="art art-in" style="--d:.4s" viewBox="0 0 300 1000" role="img" aria-label="Solid carbide end mill (illustration)">
+        <defs>
+          <linearGradient id="steel" x1="0" x2="1"><stop offset="0" stop-color="#6f7a8f"/><stop offset=".35" stop-color="#e9edf3"/><stop offset=".55" stop-color="#b7c0cf"/><stop offset="1" stop-color="#4c566b"/></linearGradient>
+          <linearGradient id="coat" x1="0" x2="1"><stop offset="0" stop-color="#0e1b38"/><stop offset=".38" stop-color="#3b5aa0"/><stop offset=".55" stop-color="#1d3466"/><stop offset="1" stop-color="#0a1430"/></linearGradient>
+          <clipPath id="body"><path d="M70 470h160v420l-30 70H100l-30-70z"/></clipPath>
+        </defs>
+        <rect x="80" y="40" width="140" height="440" rx="10" fill="url(#steel)"/>
+        <rect x="80" y="40" width="140" height="18" rx="9" fill="#dfe4ec"/>
+        <rect x="80" y="140" width="140" height="6" fill="#ff7a1a" opacity=".9"/>
+        <path d="M80 470h140l10 20H70z" fill="#9aa3b4"/>
+        <g clip-path="url(#body)">
+          <rect x="60" y="470" width="180" height="500" fill="url(#coat)"/>
+          <g stroke="#ff9a4d" stroke-width="10" opacity=".85">
+            <path d="M40 520 260 420M40 610 260 510M40 700 260 600M40 790 260 690M40 880 260 780M40 970 260 870"/>
+          </g>
+          <g stroke="#0a1430" stroke-width="16" opacity=".55">
+            <path d="M40 560 260 460M40 650 260 550M40 740 260 640M40 830 260 730M40 920 260 820"/>
+          </g>
+        </g>
+        <ellipse cx="150" cy="975" rx="70" ry="10" fill="#13254b" opacity=".18"/>
+      </svg>
     </div>
+
+    <div class="intro">
+      <p class="intro-roles wipe-in" style="--d:.8s"><span>Carbide</span><i>/</i><span>Ceramic</span><i>/</i><span>Custom</span></p>
+      <p class="intro-head">
+        <span class="wipe-in" style="--d:.9s">Cutting tools built</span>
+        <span class="wipe-in" style="--d:.99s">for zero compromise</span>
+        <span class="wipe-in" style="--d:1.08s">on the shop floor.</span>
+      </p>
+      <hr class="intro-rule" style="--d:1.25s">
+      <p class="intro-desc fade" style="--d:1.35s">Placeholder: solid carbide end mills, drills, inserts and custom tooling for aerospace, automotive and die &amp; mould makers.</p>
+    </div>
+
+    <figure class="book" style="margin:0">
+      <button class="book-frame wipe-in" id="bookFrame" style="--d:.6s" aria-expanded="false" aria-label="Open the catalogue preview">
+        <span class="book-stage" aria-hidden="true"><span class="book-shadow"></span></span>
+      </button>
+      <figcaption class="book-cap">
+        <span class="book-label fade" style="--d:1.05s" id="bookLabel"></span>
+        <span class="book-topics fade" style="--d:1.2s" id="bookTopics"></span>
+        <a href="#catalogue" class="book-arrow fade" style="--d:1.3s" aria-label="Go to catalogue downloads"><span class="mark"></span></a>
+      </figcaption>
+    </figure>
+
+    <section class="pad wipe-in" style="--d:.7s" aria-label="Note from the QC bench" id="pad"></section>
+
+    <ul class="socials" id="heroSocials" aria-label="Social links"></ul>
   </div>
 </section>
 
-<!-- Categories -->
-<section class="py-24 bg-slate-50 border-y border-slate-200">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<!-- ===== ABOUT ===== -->
+<section class="sec" id="about">
+  <div class="wrap">
+    <div class="about-top">
       <div>
-        <p class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Products</p>
-        <h2 class="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-brand-900">Featured tools</h2>
+        <p class="eyebrow">About Ceratec</p>
+        <h2 class="display">Precision<br>is a <span class="acc">habit.</span></h2>
       </div>
-      <a href="products.html" class="text-sm font-semibold text-brand-600 hover:underline">View all products →</a>
+      <div class="about-copy">
+        <p>Placeholder company story. Ceratec grinds solid carbide and ceramic cutting tools for shops that measure in microns, not millimetres.</p>
+        <p>Placeholder second paragraph about the founders, the plant, the machines and the people who run them.</p>
+      </div>
     </div>
-    <div id="featured" class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+    <div class="about-grid">
+      <div class="ph">Factory photo</div>
+      <div class="ph">CNC grinding</div>
+      <div class="ph">Inspection lab</div>
+    </div>
+    <div class="values">
+      <div class="value"><span class="num">01</span><b>Mission</b><p>Placeholder mission statement.</p></div>
+      <div class="value"><span class="num">02</span><b>Vision</b><p>Placeholder vision statement.</p></div>
+      <div class="value"><span class="num">03</span><b>In-house R&amp;D</b><p>Placeholder text about geometry and coating research.</p></div>
+      <div class="value"><span class="num">04</span><b>Quality first</b><p>Placeholder text about inspection and ISO 9001.</p></div>
+    </div>
+    <div class="stats">
+      <div><b>25<em>+</em></b><span>Years experience</span></div>
+      <div><b>5K<em>+</em></b><span>Tool variants</span></div>
+      <div><b>30<em>+</em></b><span>Countries served</span></div>
+      <div><b>ISO</b><span>9001:2015 certified</span></div>
+    </div>
   </div>
 </section>
 
-<!-- Industries -->
-<section class="py-24">
-  <div class="max-w-7xl mx-auto px-4">
-    <p class="text-brand-600 font-semibold text-sm uppercase tracking-wider text-center">Industries</p>
-    <h2 class="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-brand-900 text-center">Trusted where tolerances matter</h2>
-    <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-5">
-      <div class="rounded-xl border border-slate-200 p-6"><div class="ph rounded-lg aspect-video"></div><div class="mt-4 font-bold text-brand-900">Aerospace</div></div>
-      <div class="rounded-xl border border-slate-200 p-6"><div class="ph rounded-lg aspect-video"></div><div class="mt-4 font-bold text-brand-900">Automotive</div></div>
-      <div class="rounded-xl border border-slate-200 p-6"><div class="ph rounded-lg aspect-video"></div><div class="mt-4 font-bold text-brand-900">Die &amp; Mould</div></div>
-      <div class="rounded-xl border border-slate-200 p-6"><div class="ph rounded-lg aspect-video"></div><div class="mt-4 font-bold text-brand-900">General Engineering</div></div>
+<div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
+
+<!-- ===== PRODUCTS ===== -->
+<section class="sec" id="products">
+  <div class="wrap">
+    <div class="prod-head">
+      <div>
+        <p class="eyebrow">Products</p>
+        <h2 class="display">The <span class="acc">range.</span></h2>
+      </div>
+      <label class="filter">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="pq" type="search" placeholder="Filter by keyword (drill, carbide…)" aria-label="Filter products">
+      </label>
     </div>
+    <div class="pills" id="pills"></div>
+    <p class="count" id="pcount"></p>
+    <div class="grid" id="pgrid"></div>
+    <p class="empty" id="pempty">No products match. <a href="#contact" class="acc">Ask us for a custom tool →</a></p>
   </div>
 </section>
 
-<!-- Catalogue CTA -->
-<section class="pb-24">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="rounded-2xl bg-brand-900 text-white p-8 md:p-14 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-8">
-      <div class="absolute inset-0 grid-bg"></div>
-      <div class="relative">
-        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Get the 2026 catalogue</h2>
-        <p class="mt-3 text-slate-300">Specifications, cutting data and part numbers for the full range.</p>
+<!-- ===== CATALOGUE ===== -->
+<section class="sec catalogue" id="catalogue">
+  <div class="sun" aria-hidden="true"></div>
+  <div class="wrap" style="position:relative">
+    <p class="eyebrow">Catalogue download</p>
+    <h2 class="display">Every tool,<br><span class="acc">on paper.</span></h2>
+    <ul class="cat-list" id="catList"></ul>
+  </div>
+  <svg class="waves" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 40c120 30 240 30 360 0s240-30 360 0 240 30 360 0 240-30 360 0v50H0z" fill="#1d3466"/>
+    <path d="M0 60c120 20 240 20 360 0s240-20 360 0 240 20 360 0 240-20 360 0v30H0z" fill="#f6f1e7"/>
+  </svg>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section class="sec" id="contact">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h2 class="display">Let's cut<br><span class="acc">something.</span></h2>
+        <ul class="details" id="details"></ul>
+        <a class="cta" id="waBtn" target="_blank" rel="noopener"><span class="cta-label">Chat on WhatsApp</span><span class="mark"></span></a>
       </div>
-      <div class="relative flex flex-wrap gap-3">
-        <a href="catalogue.html" class="h-12 px-6 inline-flex items-center rounded-md bg-white text-slate-900 font-semibold hover:bg-white/90">⬇ Download Catalogue</a>
-        <a href="contact.html" class="h-12 px-6 inline-flex items-center rounded-md border border-white/25 font-semibold hover:bg-white/10">Get a Quote</a>
-      </div>
+      <form class="form" id="cform">
+        <div class="two">
+          <div class="field"><label for="f-name">Name</label><input id="f-name" name="name" required></div>
+          <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" required></div>
+        </div>
+        <div class="two">
+          <div class="field"><label for="f-co">Company</label><input id="f-co" name="company"></div>
+          <div class="field"><label for="f-ph">Phone</label><input id="f-ph" name="phone" type="tel"></div>
+        </div>
+        <div class="field"><label for="f-prod">Product / subject</label><input id="f-prod" name="product"></div>
+        <div class="field"><label for="f-msg">Your requirement</label><textarea id="f-msg" name="message" rows="4"></textarea></div>
+        <div><button class="cta" type="submit"><span class="cta-label">Send enquiry</span><span class="mark"></span></button></div>
+        <p class="done" id="cdone">Thanks! (Placeholder: this form isn't connected to email yet.)</p>
+      </form>
     </div>
+    <div class="ph map">Google Map embed</div>
   </div>
 </section>
 </main>
 
-<div id="site-footer"></div>
-<script>document.getElementById('featured').innerHTML = PRODUCTS.slice(0, 4).map(productCard).join('');</script>
+<footer class="footer">
+  <div class="wrap">
+    <p class="foot-word" aria-hidden="true">CERATEC</p>
+    <div class="foot-grid">
+      <div>
+        <h4>Stay connected</h4>
+        <p style="margin:0;color:rgb(246 241 231 / .7)">New tools, catalogues and offers.</p>
+        <form class="news" onsubmit="event.preventDefault(); this.reset()">
+          <input type="email" required placeholder="Your email" aria-label="Email">
+          <button class="cta light" type="submit" style="height:44px"><span class="cta-label">Join</span><span class="mark" style="--mark:32px"></span></button>
+        </form>
+      </div>
+      <div><h4>Quick links</h4><ul><li><a class="ulink" href="#top">Home</a></li><li><a class="ulink" href="#about">About us</a></li><li><a class="ulink" href="#products">Products</a></li><li><a class="ulink" href="#catalogue">Catalogue</a></li><li><a class="ulink" href="#contact">Contact</a></li></ul></div>
+      <div><h4>Contact</h4><ul id="footContact" style="color:rgb(246 241 231 / .8)"></ul></div>
+      <div><h4>Follow us</h4><div id="footSocials" style="display:flex;gap:12px"></div></div>
+    </div>
+    <div class="foot-bottom"><span>© 2026 Ceratec. All rights reserved.</span><span>Privacy · Terms</span></div>
+  </div>
+</footer>
+
+<div class="search" id="search" role="dialog" aria-modal="true" aria-label="Search">
+  <div class="search-box">
+    <label><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="sq" placeholder="Search products, categories, catalogues…" autocomplete="off"><kbd class="mono" style="font-size:10px">ESC</kbd></label>
+    <ul id="sres"></ul>
+  </div>
+</div>
+
+<script>
+// ---- Placeholder data: replace with real details ----
+const CONTACT = { phone: '+91 00000 00000', email: 'info@ceratec.example', sales: 'sales@ceratec.example', address: 'Placeholder address, Industrial Estate, City – 000000, India', whatsapp: 'https://wa.me/910000000000' };
+const PRODUCTS = [
+  { name: 'Solid Carbide End Mill – 4 Flute', cat: 'End Mills', tags: 'carbide milling steel square' },
+  { name: 'Ball Nose End Mill', cat: 'End Mills', tags: 'carbide die mould 3d profiling' },
+  { name: 'Corner Radius End Mill', cat: 'End Mills', tags: 'carbide radius roughing' },
+  { name: 'High-Feed End Mill', cat: 'End Mills', tags: 'carbide hfm roughing' },
+  { name: 'Solid Carbide Drill – 5xD', cat: 'Drills', tags: 'carbide drilling coolant through' },
+  { name: 'Step Drill', cat: 'Drills', tags: 'carbide custom drilling' },
+  { name: 'Spot / NC Drill', cat: 'Drills', tags: 'carbide centre spotting' },
+  { name: 'Turning Inserts', cat: 'Inserts', tags: 'ceramic cbn turning cnmg' },
+  { name: 'Milling Inserts', cat: 'Inserts', tags: 'carbide apkt face milling' },
+  { name: 'Thread Mill', cat: 'Threading', tags: 'carbide thread milling' },
+  { name: 'Machine Taps', cat: 'Threading', tags: 'hss tapping spiral' },
+  { name: 'Reamers', cat: 'Special Tools', tags: 'carbide finishing bore' },
+  { name: 'Custom Form Tools', cat: 'Special Tools', tags: 'custom profile drawing' },
+];
+// shortcut: file '#' is a placeholder; put real PDFs in /catalogues and set the paths here.
+const CATALOGUES = [
+  { name: 'General Catalogue 2026', size: 'PDF · 24 MB', file: '#', label: 'Latest catalogue', cover: ['General', 'cata-', 'logue', '2026'], topics: ['Full range'], art: 'sun', colors: { cover: '#f4e3c8', spine: '#ff7a1a' }, chapter: 'Section 01', chapterTitle: 'The full range', text: 'Every standard tool we grind, with part numbers, cutting data and stock sizes in one place.' },
+  { name: 'End Mills Catalogue', size: 'PDF · 8 MB', file: '#', label: 'Catalogue', cover: ['End', 'mills'], topics: ['Milling'], art: 'flutes', colors: { cover: '#dfe6f3', spine: '#13254b' }, chapter: 'Section 02', chapterTitle: 'Square, ball, radius', text: 'Two to six flutes, AlTiN and DLC coatings, diameters from 0.5 to 25 mm.' },
+  { name: 'Drills & Reamers', size: 'PDF · 6 MB', file: '#', label: 'Catalogue', cover: ['Drills', '& ream-', 'ers'], topics: ['Holemaking'], art: 'holes', colors: { cover: '#f6d9c4', spine: '#e2621a' }, chapter: 'Section 03', chapterTitle: 'Holes that hold size', text: 'Coolant-through drills to 8xD, step drills and H7 reamers for finished bores.' },
+  { name: 'Inserts & Holders', size: 'PDF · 10 MB', file: '#', label: 'Catalogue', cover: ['Inserts', '& hold-', 'ers'], topics: ['Turning'], art: 'inserts', colors: { cover: '#e4e8dc', spine: '#1d3466' }, chapter: 'Section 04', chapterTitle: 'Edges that last', text: 'Carbide, ceramic and CBN inserts with matching holders for turning and milling.' },
+];
+const NOTES = [ // QC note that types itself (placeholder promises)
+  'Every tool is checked to 0.002 mm before it leaves the bench.',
+  'Regrinds come back with the same edge they left with.',
+  'Custom drawings get a quote within 24 hours.',
+  'If a tool fails early, we want to know why, and we fix it.',
+];
+const SOCIALS = [
+  { name: 'Facebook', url: 'https://facebook.com/', d: 'M14 9h3V5h-3c-2.8 0-4 1.7-4 4v2H8v4h2v8h4v-8h3l1-4h-4V9.5c0-.3.2-.5.5-.5Z' },
+  { name: 'LinkedIn', url: 'https://linkedin.com/', d: 'M4 4h4v4H4zM4 10h4v10H4zM10 10h4v1.5c.6-1 1.8-1.8 3.5-1.8 2.7 0 3.5 1.8 3.5 4.5V20h-4v-5.3c0-1.2-.4-2-1.5-2s-1.5.8-1.5 2V20h-4z' },
+  { name: 'WhatsApp', url: CONTACT.whatsapp, d: 'M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Zm4.6 12.6c-.2.6-1.2 1.1-1.7 1.1-.4 0-1 .1-3.1-.8-2.6-1.1-4.2-3.7-4.3-3.9-.1-.2-1-1.4-1-2.6s.6-1.8.9-2.1c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.3 0 .5l-.4.6c-.1.2-.3.3-.1.6.2.3.7 1.1 1.5 1.8 1 .9 1.8 1.1 2.1 1.3.3.1.4.1.6-.1l.8-1c.2-.2.4-.2.6-.1l1.8.9c.3.1.4.2.5.3.1.2.1.8-.1 1.3Z' },
+  { name: 'YouTube', url: 'https://youtube.com/', d: 'M22 8.2a3 3 0 0 0-2.1-2.1C18 5.6 12 5.6 12 5.6s-6 0-7.9.5A3 3 0 0 0 2 8.2 31 31 0 0 0 1.6 12 31 31 0 0 0 2 15.8a3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1c.4-1.2.4-3.8.4-3.8s0-2.6-.4-3.8ZM10 15V9l5.2 3Z' },
+];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const matches = (p, q) => (p.name + ' ' + p.cat + ' ' + p.tags).toLowerCase().includes(q);
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>';
+document.querySelectorAll('.mark').forEach(m => m.innerHTML = ARROW.replace('<svg', '<svg class="out"') + ARROW.replace('<svg', '<svg class="in"'));
+
+// ---- Name: letter-by-letter masks (CERA rises from below, TEC drops from above, right to left) ----
+document.querySelectorAll('[data-word]').forEach(el => {
+  const letters = [...el.dataset.word], below = el.dataset.from === 'below', d0 = +el.dataset.delay;
+  el.innerHTML = letters.map((ch, i) => {
+    const order = below ? i : letters.length - 1 - i;
+    return `<span class="lm"><span class="rise" style="--from:${below ? '105%' : '-105%'};--d:${(d0 + order * .055).toFixed(3)}s">${ch}</span></span>`;
+  }).join('');
+});
+
+// ---- Splash: trace, flood, then open a hole onto the hero ----
+function startHero() { document.body.classList.add('go'); }
+(function splash() {
+  const el = $('#splash');
+  if (reduced) { el.remove(); startHero(); return; }
+  document.documentElement.style.overflow = 'hidden';
+  let opened = false;
+  const open = () => {
+    if (opened) return; opened = true; startHero();
+    const target = Math.hypot(innerWidth, innerHeight) / 2 + 24, t0 = performance.now(), dur = 850;
+    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    (function frame(now) {
+      const r = target * ease(Math.min(1, (now - t0) / dur));
+      el.style.maskImage = el.style.webkitMaskImage = `radial-gradient(circle ${r}px at 50% 50%, transparent ${Math.max(0, r - 1)}px, #000 ${r}px)`;
+      if (now - t0 < dur) requestAnimationFrame(frame);
+      else { el.remove(); document.documentElement.style.overflow = ''; }
+    })(t0);
+  };
+  Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1200))]).then(() => {
+    el.classList.add('go');
+    setTimeout(open, 1400);
+  });
+  el.addEventListener('pointerdown', open);
+  addEventListener('keydown', open, { once: true });
+})();
+
+// ---- Catalogue carousel (code-built hardcovers) ----
+const COVER_ART = {
+  sun: '<rect width="100" height="139" fill="#f4e3c8"/><circle cx="50" cy="92" r="30" fill="#ff7a1a"/><g fill="#f4e3c8"><rect y="96" width="100" height="2.4"/><rect y="103" width="100" height="2.4"/></g><path d="M0 108c12 5 25 5 37 0s25-5 38 0 25 5 25 0v31H0z" fill="#13254b"/>',
+  flutes: '<rect width="100" height="139" fill="#dfe6f3"/><rect x="38" y="40" width="24" height="99" fill="#13254b"/><g stroke="#ff7a1a" stroke-width="3"><path d="M30 80 70 64M30 96 70 80M30 112 70 96M30 128 70 112"/></g>',
+  holes: '<rect width="100" height="139" fill="#f6d9c4"/><g fill="none" stroke="#e2621a" stroke-width="3"><circle cx="50" cy="96" r="28"/><circle cx="50" cy="96" r="18"/></g><circle cx="50" cy="96" r="8" fill="#13254b"/>',
+  inserts: '<rect width="100" height="139" fill="#e4e8dc"/><g fill="#1d3466"><path d="M30 70l12 14-12 14-12-14z"/><path d="M70 70l12 14-12 14-12-14z"/></g><path d="M50 96l12 14-12 14-12-14z" fill="#ff7a1a"/>',
+};
+(function catalogueBook() {
+  const frame = $('#bookFrame'), stage = frame.querySelector('.book-stage');
+  let index = 0, open = false, hovered = false, timer;
+  const build = c => {
+    const s = document.createElement('span');
+    s.className = 'slot';
+    s.innerHTML = `<span class="b3d" style="--cover:${c.colors.cover};--spine:${c.colors.spine}">
+      <span class="b-back"></span><span class="b-edge"></span>
+      <span class="b-spine"><span>${esc(c.name)}</span></span>
+      <span class="b-page"><span>${esc(c.text)}</span><span class="b-folio mono">${esc(c.size)}</span></span>
+      <span class="b-hinge"><span class="b-cover">
+        <span class="b-front"><svg viewBox="0 0 100 139" preserveAspectRatio="xMidYMid slice">${COVER_ART[c.art]}</svg>
+          <span class="b-title">${c.cover.map(l => `<span>${esc(l)}</span>`).join('')}</span><span class="b-by">Ceratec</span></span>
+        <span class="b-inside"><span class="b-chapter">${esc(c.chapter)}</span><span class="b-inside-title">${esc(c.chapterTitle)}</span></span>
+      </span></span></span>`;
+    return s;
+  };
+  const caption = () => {
+    const c = CATALOGUES[index];
+    $('#bookLabel').textContent = c.label;
+    $('#bookTopics').innerHTML = c.topics.map(esc).join(' <span class="slash">/</span> ');
+  };
+  const show = (next, slide) => {
+    const old = stage.querySelector('.slot'), s = build(CATALOGUES[next]);
+    if (slide && old && !reduced) {
+      s.style.transform = 'translateX(100%)'; stage.append(s); s.offsetWidth;
+      s.style.transform = ''; old.style.transform = 'translateX(-100%)';
+      setTimeout(() => old.remove(), 900);
+    } else { old?.remove(); stage.append(s); }
+    index = next; caption();
+  };
+  const schedule = () => {
+    clearTimeout(timer);
+    if (!reduced && !open && !hovered) timer = setTimeout(() => { show((index + 1) % CATALOGUES.length, true); schedule(); }, 3500);
+  };
+  frame.addEventListener('click', () => {
+    open = !open; frame.classList.toggle('open', open); frame.setAttribute('aria-expanded', open);
+    if (!open) setTimeout(() => { show((index + 1) % CATALOGUES.length, true); schedule(); }, reduced ? 0 : 650);
+    else clearTimeout(timer);
+  });
+  frame.addEventListener('pointerenter', () => { hovered = true; clearTimeout(timer); });
+  frame.addEventListener('pointerleave', () => { hovered = false; const b = frame.querySelector('.b3d'); b?.style.removeProperty('--ry'); b?.style.removeProperty('--rx'); schedule(); });
+  frame.addEventListener('pointermove', e => {
+    if (!finePointer || reduced || open) return;
+    const r = frame.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 2 - 1, y = (e.clientY - r.top) / r.height * 2 - 1;
+    const b = frame.querySelector('.slot:last-child .b3d');
+    b.style.setProperty('--ry', `${-24 + x * 14}deg`); b.style.setProperty('--rx', `${6 - y * 7}deg`);
+  });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && open) frame.click(); });
+  show(0, false); setTimeout(schedule, 2500);
+})();
+
+// ---- QC note that types itself ----
+(function qcNote() {
+  const pad = $('#pad'); let i = 0;
+  const render = () => {
+    pad.innerHTML = `<div class="sheet"><p class="sheet-eyebrow">Note from the QC bench</p><span class="stamp">QC<br>passed</span>
+      <p class="sheet-greet">Dear customer,</p><p class="sheet-text"><span class="t"></span><span class="caret"></span></p>
+      <p class="sheet-meta">Note ${String(i + 1).padStart(2, '0')} / ${String(NOTES.length).padStart(2, '0')}</p></div>`;
+    return pad.querySelector('.sheet');
+  };
+  if (reduced) { const s = render(); s.querySelector('.t').textContent = NOTES[0]; s.querySelector('.caret').remove(); s.querySelector('.stamp').classList.add('ready'); return; }
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const visible = () => new Promise(r => { const f = () => document.hidden ? setTimeout(f, 500) : r(); f(); });
+  (async function loop() {
+    await wait(2600);
+    for (;;) {
+      const s = render(), t = s.querySelector('.t'), msg = NOTES[i];
+      for (let n = 1; n <= msg.length; n++) { await visible(); t.textContent = msg.slice(0, n); await wait(70 + (/[,.]/.test(msg[n - 1]) ? 340 : 0)); }
+      s.querySelector('.caret').remove(); s.querySelector('.stamp').classList.add('ready'); await wait(1300);
+      s.querySelector('.stamp').classList.add('pressed'); await wait(1800);
+      s.classList.add('leaving'); await wait(650);
+      i = (i + 1) % NOTES.length;
+    }
+  })();
+})();
+
+// ---- Socials, contact details, marquee ----
+const socialIcon = s => `<svg viewBox="0 0 24 24" fill="currentColor"><path d="${s.d}"/></svg>`;
+$('#heroSocials').innerHTML = SOCIALS.map((s, i) => `${i ? `<li class="slash fade" style="--d:${1.15 + i * .14}s" aria-hidden="true">/</li>` : ''}<li class="fade" style="--d:${1.2 + i * .14}s"><a class="ulink" href="${s.url}" target="_blank" rel="noopener">${s.name}</a></li>`).join('');
+$('#footSocials').innerHTML = SOCIALS.map(s => `<a class="round" href="${s.url}" target="_blank" rel="noopener" aria-label="${s.name}">${socialIcon(s)}<span class="tip">Follow us on ${s.name}</span></a>`).join('');
+$('#details').innerHTML = [['Address', esc(CONTACT.address)], ['Phone', `<a class="ulink" href="tel:${CONTACT.phone.replace(/\s/g, '')}">${CONTACT.phone}</a>`], ['Email', `<a class="ulink" href="mailto:${CONTACT.sales}">${CONTACT.sales}</a>`]].map(([k, v]) => `<li><span>${k}</span>${v}</li>`).join('');
+$('#footContact').innerHTML = `<li>${esc(CONTACT.address)}</li><li>${CONTACT.phone}</li><li>${CONTACT.email}</li>`;
+$('#waBtn').href = CONTACT.whatsapp;
+const IND = ['Aerospace', 'Automotive', 'Die & Mould', 'Medical', 'Energy', 'General Engineering'];
+$('#marquee').innerHTML = [...IND, ...IND].map(w => `<span>${esc(w)}</span><i>✦</i>`).join('');
+
+// ---- Products ----
+const CATS = ['All', ...new Set(PRODUCTS.map(p => p.cat))];
+let activeCat = 'All';
+function renderProducts() {
+  const q = $('#pq').value.trim().toLowerCase();
+  $('#pills').innerHTML = CATS.map(c => `<button class="pill ${c === activeCat ? 'on' : ''}" data-cat="${c}">${c}</button>`).join('');
+  const list = PRODUCTS.filter(p => (activeCat === 'All' || p.cat === activeCat) && matches(p, q));
+  $('#pgrid').innerHTML = list.map(p => `<article class="card"><div class="ph">Product image</div><div class="card-body">
+    <span class="card-cat">${esc(p.cat)}</span><span class="card-name">${esc(p.name)}</span>
+    <button class="card-link ulink" data-enquire="${esc(p.name)}">Enquire <span class="acc">↗</span></button></div></article>`).join('');
+  $('#pcount').textContent = `${list.length} product${list.length === 1 ? '' : 's'}`;
+  $('#pempty').style.display = list.length ? 'none' : 'block';
+}
+$('#pq').addEventListener('input', renderProducts);
+$('#pills').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) { activeCat = b.dataset.cat; renderProducts(); } });
+$('#pgrid').addEventListener('click', e => {
+  const b = e.target.closest('[data-enquire]'); if (!b) return;
+  $('#f-prod').value = b.dataset.enquire; $('#contact').scrollIntoView(); $('#f-name').focus({ preventScroll: true });
+});
+renderProducts();
+
+// ---- Catalogue list ----
+$('#catList').innerHTML = CATALOGUES.map((c, i) => `<li class="cat-row"><span class="idx">0${i + 1}</span>
+  <div><h3>${esc(c.name)}</h3><small>${esc(c.size)}</small></div>
+  <a class="cta light" href="${c.file}" download><span class="cta-label">Download</span><span class="mark"></span></a></li>`).join('');
+document.querySelectorAll('#catList .mark').forEach(m => m.innerHTML = ARROW.replace('<svg', '<svg class="out"') + ARROW.replace('<svg', '<svg class="in"'));
+
+// ---- Contact form (placeholder: no backend yet) ----
+$('#cform').addEventListener('submit', e => { e.preventDefault(); e.target.reset(); $('#cdone').style.display = 'block'; });
+
+// ---- Keyword search (Ctrl+K) ----
+function renderSearch() {
+  const q = $('#sq').value.trim().toLowerCase(), res = $('#sres');
+  if (!q) { res.innerHTML = '<li class="hint">Type a keyword, e.g. "carbide", "drill", "insert"</li>'; return; }
+  const hits = PRODUCTS.filter(p => matches(p, q)).map(p => ({ t: p.name, s: p.cat, k: 'p' }))
+    .concat(CATALOGUES.filter(c => c.name.toLowerCase().includes(q)).map(c => ({ t: c.name, s: 'Catalogue', k: 'c' })));
+  res.innerHTML = hits.length ? hits.map(h => `<li><a href="${h.k === 'p' ? '#products' : '#catalogue'}" data-pick="${h.k === 'p' ? esc(h.t) : ''}"><span>${esc(h.t)}</span><small>${esc(h.s)}</small></a></li>`).join('')
+    : '<li class="hint">No results</li>';
+}
+function openSearch() { $('#search').classList.add('open'); $('#sq').value = ''; renderSearch(); $('#sq').focus(); }
+function closeSearch() { $('#search').classList.remove('open'); }
+document.addEventListener('click', e => { if (e.target.closest('[data-search]')) openSearch(); });
+$('#search').addEventListener('click', e => {
+  if (e.target === e.currentTarget) return closeSearch();
+  const a = e.target.closest('[data-pick]'); if (!a) return;
+  if (a.dataset.pick) { activeCat = 'All'; $('#pq').value = a.dataset.pick; renderProducts(); }
+  closeSearch();
+});
+$('#sq').addEventListener('input', renderSearch);
+$('#sq').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  activeCat = 'All'; $('#pq').value = e.target.value; renderProducts(); closeSearch(); $('#products').scrollIntoView();
+});
+addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openSearch(); }
+  if (e.key === 'Escape') closeSearch();
+});
+
+// ---- Mini bar after the hero ----
+new IntersectionObserver(([en]) => $('#minibar').classList.toggle('show', !en.isIntersecting)).observe($('.nav'));
+
+// ---- Ink cursor + parallax drift of the tool (mouse only) ----
+if (finePointer && !reduced) {
+  const cur = $('#cursor'), dot = cur.querySelector('.c-dot'), ring = cur.querySelector('.c-ring'), disc = cur.querySelector('.c-disc'), art = $('.art');
+  document.body.classList.add('has-cursor');
+  let x = -100, y = -100, rx = x, ry = y;
+  addEventListener('pointermove', e => {
+    x = e.clientX; y = e.clientY; cur.classList.add('on');
+    const t = e.target;
+    cur.classList.toggle('read', !!t.closest?.('.book-frame'));
+    cur.classList.toggle('link', !t.closest?.('.book-frame') && !!t.closest?.('a, button, input, textarea'));
+    art.style.setProperty('--px', `${(x / innerWidth * 2 - 1) * 14}px`);
+  }, { passive: true });
+  document.addEventListener('pointerleave', () => cur.classList.remove('on'));
+  (function tick() {
+    rx += (x - rx) * .22; ry += (y - ry) * .22;
+    dot.style.transform = `translate(${x}px, ${y}px)`;
+    ring.style.transform = disc.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(tick);
+  })();
+}
+</script>
 </body>
 </html>
